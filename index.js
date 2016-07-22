@@ -6,8 +6,8 @@ var evArr = [];
 var map;
 var search = document.querySelector('#search-button');
 var artist = document.querySelector('#artist-box');
-// var beURL = 'http://localhost:3000';
-var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
+var beURL = 'http://localhost:3000';
+// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 var addCal;
 var infoWinArr = [];
 
