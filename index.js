@@ -11,7 +11,6 @@ var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 var addCal;
 var infoWinArr = [];
 
-
 // ev listener on search button that inits api call to bandplanner api
 search.addEventListener('click', function(e) {
   e.preventDefault();
