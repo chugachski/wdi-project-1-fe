@@ -134,7 +134,7 @@ function initMap(lat, lon) {
   });
   console.log()
 
-  var image = '/images/azure_marker.png';
+  var image = 'azure_marker.png';
   var marker = new google.maps.Marker({
     position: pos,
     map: map,
