@@ -1,0 +1,8 @@
+
+Application name    Band Planner
+API key 82dc26b550fe78ce042eec45f304b49c
+Shared secret   e7112db050d2aa6477fdee07e0f29246
+Registered to   nasmithwdi
+
+
+http://www.last.fm/api/auth/?api_key=82dc26b550fe78ce042eec45f304b49c
