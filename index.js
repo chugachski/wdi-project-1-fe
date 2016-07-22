@@ -6,7 +6,8 @@ var evArr = [];
 var map;
 var search = document.querySelector('#search-button');
 var artist = document.querySelector('#artist-box');
-var beURL = 'http://localhost:3000';
+// var beURL = 'http://localhost:3000';
+var beURL = 'https://git.heroku.com/peaceful-dawn-99409.git';
 var addCal;
 var infoWinArr = [];
 
