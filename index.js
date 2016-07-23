@@ -10,14 +10,17 @@ var beURL = 'http://localhost:3000';
 // var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 var addCal;
 var infoWinArr = [];
+var trackArr = [];
+var songsDiv = document.querySelector('#songs');
+var form = document.querySelector('#form');
+var isPlaying = false;
 
 // ev listener on search button that inits api call to bandplanner api
 search.addEventListener('click', function(e) {
   e.preventDefault();
 
   // need to clear out markers
-  // need to clear out evArr
-  evArr = [];
+  evArr = []; // clear out evArr
 
   var artistReq = artist.value.toLowerCase();
   console.log('Search button clicked, INPUT:', artistReq);
@@ -32,12 +35,24 @@ search.addEventListener('click', function(e) {
     method: 'POST',
     dataType: 'json'
   }).done(function(response) {
-    console.log('BANDS events resp:', response);
-    makeEventO(response);
-    callCreate(evArr);
-    spotifyId(data);
+    // console.log('BANDS events resp:', response);
+    if (response.length) {
+      makeEventO(response);
+      callCreate(evArr);
+      spotifyId(data);
+    } else {
+      console.log('No events found for artist:', artistReq);
+      noEvMsg(artistReq);
+    }
   }); // end ajax
 });
+
+function noEvMsg(artist) {
+  msg = document.createElement('div');
+  artistText = document.createTextNode('No upcoming events found for' + artist + '. Try searching for Drake!');
+  msg.appendChild(artistText);
+  form.appendChild(msg)
+}
 
 // get back an artist id
 function spotifyId(data) {
@@ -47,7 +62,7 @@ function spotifyId(data) {
     method: 'POST',
     dataType: 'json'
   }).done(function(response) {
-    console.log('SPOTIFY id resp:', response);
+    // console.log('SPOTIFY id resp:', response);
     var id = response.artists.items[0].id
     spotifyReq(id);
   }); // end ajax
@@ -67,7 +82,111 @@ function spotifyReq(artistId) {
     dataType: 'json'
   }).done(function(response) {
     console.log('SPOTIFY top tracks resp:', response);
+    makeTrackO(response);
+    console.log('TRACK ARR:', trackArr);
+    callTrack(trackArr);
+
   })
+}
+
+// call makeTrackDiv with 3 random top songs
+function callTrack(tracks) {
+  var randArr = [];
+
+    while (randArr.length < 3) {
+      var idx = Math.floor(Math.random() * tracks.length);
+      if (!randArr.includes(idx)) { // only add if num is unique
+        randArr.push(idx);
+      }
+    }
+
+  // console.log('RANDARR:', randArr);
+
+  addArtistHeader(tracks[0].artists);
+
+  for (j=0; j<randArr.length; j++) {
+    makeTrackDiv(tracks[randArr[j]]);
+  }
+  initSongListeners();
+}
+
+function addArtistHeader(name) {
+  var h3 = document.createElement('h3');
+  var h5 = document.createElement('h5');
+  var headingText = document.createTextNode('Preview the concert! Click an image to play.');
+  var artistText = document.createTextNode(name);
+  h3.appendChild(headingText);
+  h5.appendChild(artistText);
+  songsDiv.appendChild(h3);
+}
+
+function makeTrackDiv(track) {
+  var playDiv = document.createElement('div');
+  var h5 = document.createElement('h5');
+  var songImg = document.createElement('img');
+  var nameText = document.createTextNode(track.name);
+  var audio = document.createElement('audio');
+
+  h5.appendChild(nameText);
+  playDiv.classList.add('track');
+  audio.setAttribute('src', track.preview_url);
+  songImg.setAttribute('src', track.image);
+  songImg.id = track.id;
+  songImg.appendChild(audio);
+  playDiv.appendChild(h5);
+  playDiv.appendChild(songImg);
+  songsDiv.appendChild(playDiv);
+}
+
+// citation: uses Babajide Kale's technique
+function initSongListeners() {
+  // add ev listener to entire doc
+  document.addEventListener('click', function(event) {
+    // console.log('EV OBJ:', event);
+    var songId = document.getElementById(event.target.id)
+    // console.log('songId.firstChild:', songId.firstChild);
+    // console.log('songId:', songId);
+    if (event.target.id) {
+      if (isPlaying === false) {
+        songId.firstChild.play();
+        isPlaying = true;
+        console.log('Playing track...')
+      } else if (isPlaying === true) {
+        songId.firstChild.pause();
+        isPlaying = false;
+        console.log('Track paused.')
+      }
+    }
+  })
+}
+// end citation
+
+function makeTrackO(resp) {
+  var trackObj = {};
+  for (var i=0; i<resp.tracks.length; i++) {
+
+    for (prop in resp.tracks[i]) {
+      if (prop === 'artists') {
+        trackObj['artists'] = resp.tracks[i].artists[0].name;
+      }
+      if (prop === 'name') {
+        trackObj['name'] = resp.tracks[i].name;
+      }
+      if (prop === 'preview_url') {
+        trackObj['preview_url'] = resp.tracks[i].preview_url;
+      }
+      if (prop === 'popularity') {
+        trackObj['popularity'] = resp.tracks[i].popularity;
+      }
+      if (prop === 'album') {
+        trackObj['image'] = resp.tracks[i].album.images[1].url;
+        trackObj['id'] = resp.tracks[i].album.id;
+      }
+      // trackObj['id'] = Math.floor(Math.random() * 1000);
+    }
+  trackArr.push(trackObj);
+  trackObj = {}; // clear out the old contents
+  }
 }
 
 // make an object containing only relevant data and push to evArr
@@ -132,7 +251,6 @@ function initMap(lat, lon) {
     scrollwheel: false,
     zoom: 4
   });
-  console.log()
 
   var image = 'azure_marker.png';
   var marker = new google.maps.Marker({
@@ -154,8 +272,8 @@ function initMap(lat, lon) {
 }
 
 function callCreate(evArr) {
-    for (var i=0; i<5; i++) {
-      createMarker(evArr[i]);
+    for (var i=0; i<7; i++) {
+      createMarker(evArr[i], i);
     }
 }
 
@@ -165,11 +283,8 @@ function closeWin() {
   }
 }
 
-function clearMarkers() {
-
-}
-
 function createMarker(event) {
+
   var pos = {lat: event.latitude, lng: event.longitude};
   var contentStr = '<div id="content">' +
     '<p><b>' + event.artists + ' @ ' + event.city + ', ' + event.region + '</b></p>' +
@@ -209,5 +324,34 @@ function createMarker(event) {
   })
 }
 
-
-
+function auto() {
+  $(function() {
+    var autoChoices = [
+      'Tedeschi Trucks Band',
+      'Drake',
+      'Adele',
+      'Heartless Bastards',
+      'Billy Idol',
+      'Billy Joel',
+      'Steely Dan',
+      'Norah Jones',
+      'Alabama Shakes',
+      'Sia',
+      'Flogging Molly',
+      'Flight of the Conchords',
+      'Goo Goo Dolls',
+      'Bonnie Rait',
+      'Wilco',
+      'Kenny G',
+      'Alice in Chains',
+      'M83',
+      'Modest Mouse',
+      'The Lumineers',
+      'Wierd Al Yankovic'
+    ];
+    $('#artist-box').autocomplete({
+      source: autoChoices,
+      minLength: 3,
+    });
+  });
+}

@@ -10,7 +10,7 @@
 <body>
   <h1>Band Planner APP</h1>
 
-  <form>
+  <form id="form">
     <div id="input">
       <h2>Artists Search</h2><span><input placeholder="artist" type="text" id="artist-box"><button id="search-button">Search</button></span>
     </div>
@@ -18,10 +18,11 @@
 
   <div id="map"></div>
 
-  <div id="results"></div>
+  <div id="songs"></div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
   <script src="index.js" type="text/javascript"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPf4_3wvLi4Etzi-hiUfeX71NnKMSUb-Q&callback=initMap">
   </script>
