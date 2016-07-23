@@ -4,23 +4,37 @@ var nav = navigator.geolocation; // get back nav object
 var coords = {};
 var evArr = [];
 var map;
-var mapContainer = document.querySelector('#map');
-var search = document.querySelector('#search-button');
-var artist = document.querySelector('#artist-box');
-var beURL = 'http://localhost:3000';
-// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 var addCal;
 var infoWinArr = [];
 var trackArr = [];
-var songsDiv = document.querySelector('#songs');
-var form = document.querySelector('#form');
 var isPlaying = false;
 
-// ev listener on search button that inits api call to bandplanner api
-search.addEventListener('click', function(e) {
-  e.preventDefault();
+var mapContainer = document.querySelector('#map');
+var search = document.querySelector('#search-button');
+var artist = document.querySelector('#artist-box');
+var songsDiv = document.querySelector('#songs');
+var form = document.querySelector('#form');
+var viewB = document.querySelector('#view-cal');
 
-  // need to clear out markers
+var beURL = 'http://localhost:3000';
+// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
+
+viewB.addEventListener('click', function(ev) {
+  ev.preventDefault();
+
+  $.ajax({
+    url: beURL + '/events',
+    dataType: 'json'
+  }).done(function(response) {
+    console.log(response);
+  })
+})
+
+// ev listener on search button that inits api call to bandplanner api
+search.addEventListener('click', function(ev) {
+  ev.preventDefault();
+
+  // need to clear out markers on new search
   evArr = []; // clear out evArr
 
   var artistReq = artist.value.toLowerCase();
@@ -29,7 +43,6 @@ search.addEventListener('click', function(e) {
   var data = {
     artist: artistReq
   }
-
   $.ajax({
     url: beURL + '/planner/search',
     data: data,
@@ -51,10 +64,13 @@ search.addEventListener('click', function(e) {
 });
 
 function noEvMsg(artist) {
-  msg = document.createElement('div');
-  artistText = document.createTextNode('No upcoming events found for' + artist + '. Try searching for Drake!');
-  msg.appendChild(artistText);
-  form.appendChild(msg)
+  var msg = document.createElement('div');
+  var par = document.createElement('p');
+  var artistText = document.createTextNode('No upcoming events found for "' + artist + '"   :(   iTry searching for Drake!');
+  par.id = 'error-msg';
+  par.appendChild(artistText);
+  msg.appendChild(par);
+  form.appendChild(msg);
 }
 
 // get back an artist id
@@ -139,6 +155,7 @@ function makeTrackDiv(track) {
   playDiv.classList.add('track');
   audio.setAttribute('src', track.preview_url);
   songImg.setAttribute('src', track.image);
+  songImg.classList.add('album');
   songImg.id = track.id;
   songImg.appendChild(audio);
   playDiv.appendChild(h5);

@@ -37,28 +37,41 @@ body {
 #side-bar {
   width: 30%;
   height: 100%;
-  background-color: lightpink;
+  background-color: #BC8F8F;
   display: block;
   float: left;
   padding: 2.5%;
 }
 
+.album {
+  width: 80%;
+}
+
 #map {
   width: 100%;
-  height: 70%;
+  height: 60%;
+  margin-top: 2.5%;
 }
 
 #input {
   padding-bottom: 2.5%;
 }
 
-h1, h5 {
+#error-msg {
+  margin: 0;
+}
+
+h1, h3, h5 {
   text-align: center;
 }
 
 h1 {
   margin: 0;
+}
 
+#error-msg {
+  color: #f00;
+  font-weight: bold;
 }
 
 img {
