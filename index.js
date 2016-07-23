@@ -4,6 +4,7 @@ var nav = navigator.geolocation; // get back nav object
 var coords = {};
 var evArr = [];
 var map;
+var mapContainer = document.querySelector('#map');
 var search = document.querySelector('#search-button');
 var artist = document.querySelector('#artist-box');
 var beURL = 'http://localhost:3000';
@@ -35,9 +36,11 @@ search.addEventListener('click', function(e) {
     method: 'POST',
     dataType: 'json'
   }).done(function(response) {
-    // console.log('BANDS events resp:', response);
+    console.log('BANDS events resp:', response);
     if (response.length) {
       makeEventO(response);
+      wipeMap();
+      initMap(coords.lat, coords.lon);
       callCreate(evArr);
       spotifyId(data);
     } else {
@@ -113,11 +116,16 @@ function callTrack(tracks) {
 function addArtistHeader(name) {
   var h3 = document.createElement('h3');
   var h5 = document.createElement('h5');
-  var headingText = document.createTextNode('Preview the concert! Click an image to play.');
+  var h3Sub = document.createElement('h3');
+  var headingText = document.createTextNode('Preview the ' + name + ' concert!');
+  var headingTextTwo = document.createTextNode('Click an image to play:');
   var artistText = document.createTextNode(name);
+
   h3.appendChild(headingText);
+  h3Sub.appendChild(headingTextTwo);
   h5.appendChild(artistText);
   songsDiv.appendChild(h3);
+  songsDiv.appendChild(h3Sub);
 }
 
 function makeTrackDiv(track) {
@@ -203,6 +211,9 @@ function makeEventO(resp) {
         evObj['latitude'] = parseFloat(resp[i].venue.latitude);
         evObj['longitude'] = parseFloat(resp[i].venue.longitude);
       }
+      if (prop === 'id') {
+        evObj['eventId'] = resp[i][prop];
+      }
       if (prop === 'artists') { // might have to rework if multiple artists
         evObj['artists'] = resp[i][prop][0].name;
       }
@@ -272,9 +283,13 @@ function initMap(lat, lon) {
 }
 
 function callCreate(evArr) {
-    for (var i=0; i<7; i++) {
-      createMarker(evArr[i], i);
-    }
+  for (var i=0; i<7; i++) {
+    createMarker(evArr[i]);
+  }
+}
+
+function wipeMap() {
+  mapContainer.innerHTML = '';
 }
 
 function closeWin() {
@@ -284,7 +299,6 @@ function closeWin() {
 }
 
 function createMarker(event) {
-
   var pos = {lat: event.latitude, lng: event.longitude};
   var contentStr = '<div id="content">' +
     '<p><b>' + event.artists + ' @ ' + event.city + ', ' + event.region + '</b></p>' +
