@@ -37,7 +37,7 @@ viewB.addEventListener('click', function(ev) {
 
 // fill in modal body with details
 function renderModal(dbResults) {
-  // innerContent.innerHTML = '';
+  innerContent.innerHTML = '';
   for (i=0; i<dbResults.length; i++) {
     var myEvent = document.createElement('div');
     var p1 = document.createElement('p');

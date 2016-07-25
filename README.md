@@ -1,17 +1,18 @@
 # Full-Stack API project
 
 ## Links
- *https://chugachski.github.io/wdi-project-2-fe
- *https://peaceful-dawn-99409.herokuapp.com
- *https://github.com/chugachski/wdi-project-2-fe
- *https://github.com/chugachski/wdi-project-2-be
+ * https://chugachski.github.io/wdi-project-2-fe
+ * https://peaceful-dawn-99409.herokuapp.com
+ * https://github.com/chugachski/wdi-project-2-fe
+ * https://github.com/chugachski/wdi-project-2-be
 
 ## Technologies:
- *HTML
- *CSS
- *JavaScript
- *Node
- *Bootstrap
+ * HTML
+ * CSS
+ * JavaScript
+ * Node
+ * MongoDB
+ * Bootstrap
 
 ## External APIs
 * Geolocation API
