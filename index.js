@@ -22,8 +22,8 @@ var modal = document.querySelector('#modal');
 var closeBtn = document.querySelector('#hide');
 var innerContent = document.querySelector('.modal-body');
 
-var beURL = 'http://localhost:3000';
-// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
+// var beURL = 'http://localhost:3000';
+var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 
 viewB.addEventListener('click', function(ev) {
   ev.preventDefault();
