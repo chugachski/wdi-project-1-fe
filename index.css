@@ -16,7 +16,6 @@ body {
 header {
   height: 60px;
   background-color: #efefef;
-
 }
 
 img {
@@ -60,6 +59,10 @@ h1 {
 
 .bold {
   font-weight: bold;
+}
+
+.red {
+  color: #b30000;
 }
 
 #map {

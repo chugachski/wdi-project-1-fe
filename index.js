@@ -31,44 +31,50 @@ viewB.addEventListener('click', function(ev) {
     dataType: 'json'
   }).done(function(response) {
     console.log(response);
-    // renderModal(response);
-
-    for (i=0; i<response.length; i++) {
-      var myEvent = document.createElement('div');
-      var p1 = document.createElement('p');
-      var p2 = document.createElement('p');
-      var p3 = document.createElement('p');
-      var remove = document.createElement('button');
-      var p1Text = document.createTextNode(response[i].artists + ' @ ' + response[i].city + ', ' + response[i].region);
-      var p2Text = document.createTextNode(response[i].formatted_datetime);
-      var p3Text = document.createTextNode(response[i].name);
-      var remove = document.createElement('button');
-      var btnText = document.createTextNode('Remove from calendar');
-
-      remove.classList.add('btn');
-      remove.classList.add('btn-secondary');
-      remove.id = i;
-      p1.classList.add('bold');
-      myEvent.classList.add('saved-event');
-
-      p1.appendChild(p1Text);
-      p2.appendChild(p2Text);
-      p3.appendChild(p3Text);
-      remove.appendChild(btnText);
-
-      myEvent.appendChild(p1);
-      myEvent.appendChild(p2);
-      myEvent.appendChild(p3);
-      myEvent.appendChild(remove);
-      // append to modal
-      innerContent.appendChild(myEvent);
-
-      initRemove(remove, response[i].eventId);
-    }
-
+    renderModal(response);
   })
 })
 
+// fill in modal body with details
+function renderModal(dbResults) {
+  // innerContent.innerHTML = '';
+  for (i=0; i<dbResults.length; i++) {
+    var myEvent = document.createElement('div');
+    var p1 = document.createElement('p');
+    var p2 = document.createElement('p');
+    var p3 = document.createElement('p');
+    var remove = document.createElement('button');
+    var p1Text = document.createTextNode(dbResults[i].artists + ' @ ' + dbResults[i].city + ', ' + dbResults[i].region);
+    var p2Text = document.createTextNode(dbResults[i].formatted_datetime);
+    var p3Text = document.createTextNode(dbResults[i].name);
+    var remove = document.createElement('button');
+    var btnText = document.createTextNode('Remove from calendar');
+
+    remove.classList.add('btn');
+    remove.classList.add('btn-secondary');
+    remove.id = i;
+    p1.classList.add('bold');
+    myEvent.classList.add('saved-event');
+
+    p1.appendChild(p1Text);
+    p2.appendChild(p2Text);
+    p3.appendChild(p3Text);
+    remove.appendChild(btnText);
+
+    myEvent.appendChild(p1);
+    myEvent.appendChild(p2);
+    myEvent.appendChild(p3);
+    myEvent.appendChild(remove);
+    // append to modal
+    innerContent.appendChild(myEvent);
+
+    initRemove(remove, dbResults[i].eventId);
+  }
+}
+
+// adds ev listener to remove from cal button
+// initiatates req to delete record from db
+// appends success msg to modal body
 function initRemove(button, ident) {
   button.addEventListener('click', function(ev) {
     console.log('remove btn clicked');
@@ -84,10 +90,14 @@ function initRemove(button, ident) {
       method: 'DELETE'
     }).done(function(response) {
       console.log(ident, 'has been removed');
-      console.log(response)
+      console.log(response);
+      var message = document.createElement('p');
+      var pText = document.createTextNode(response);
+      message.classList.add('red');
+      message.classList.add('bold');
+      message.appendChild(pText);
+      innerContent.appendChild(message);
     })
-
-
   })
 }
 
@@ -125,12 +135,14 @@ search.addEventListener('click', function(ev) {
   }); // end ajax
 });
 
+// tells user if no upcoming events found
 function noEvMsg(artist) {
   msg.innerHTML = '';
   msg = document.createElement('div');
   var par = document.createElement('p');
   var artistText = document.createTextNode('No upcoming events found for "' + artist + '"   :(   Try searching for Drake!');
-  par.id = 'error-msg';
+  par.classList.add('bold');
+  par.classList.add('red');
   par.appendChild(artistText);
   msg.appendChild(par);
   form.appendChild(msg);
@@ -192,6 +204,7 @@ function callTrack(tracks) {
   initSongListeners();
 }
 
+// adds headers to sidebar results from spotify req
 function addArtistHeader(name) {
   var h3 = document.createElement('h3');
   var h5 = document.createElement('h5');
@@ -207,6 +220,7 @@ function addArtistHeader(name) {
   songsDiv.appendChild(h3Sub);
 }
 
+// adds album divs to sidebar
 function makeTrackDiv(track) {
   var playDiv = document.createElement('div');
   var h5 = document.createElement('h5');
@@ -252,6 +266,7 @@ function initSongListeners() {
 }
 // end citation
 
+// make an object with just the things I'm interested in
 function makeTrackO(resp) {
   var trackObj = {};
   for (var i=0; i<resp.tracks.length; i++) {
@@ -365,22 +380,26 @@ function initMap(lat, lon) {
   })
 }
 
+// calls create marker once for each elem in arr up to 7 events
 function callCreate(evArr) {
   for (var i=0; i<7; i++) {
     createMarker(evArr[i]);
   }
 }
 
+// clears markers from map on new search
 function wipeMap() {
   mapContainer.innerHTML = '';
 }
 
+// close info windows upon clicking new marker
 function closeWin() {
   for (var i=0; i<infoWinArr.length; i++) {
     infoWinArr[i].close();
   }
 }
 
+// create marker, infoWindow, add button for each call
 function createMarker(event) {
   var pos = {lat: event.latitude, lng: event.longitude};
   var contentStr = '<div id="content">' +
