@@ -8,13 +8,17 @@ var addCal;
 var infoWinArr = [];
 var trackArr = [];
 var isPlaying = false;
+var msg = '';
 
 var mapContainer = document.querySelector('#map');
 var search = document.querySelector('#search-button');
 var artist = document.querySelector('#artist-box');
 var songsDiv = document.querySelector('#songs');
-var form = document.querySelector('#form');
+var form = document.querySelector('.form-group');
 var viewB = document.querySelector('#view-cal');
+var modal = document.querySelector('#modal');
+var closeBtn = document.querySelector('#hide');
+var innerContent = document.querySelector('.modal-body');
 
 var beURL = 'http://localhost:3000';
 // var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
@@ -27,8 +31,65 @@ viewB.addEventListener('click', function(ev) {
     dataType: 'json'
   }).done(function(response) {
     console.log(response);
+    // renderModal(response);
+
+    for (i=0; i<response.length; i++) {
+      var myEvent = document.createElement('div');
+      var p1 = document.createElement('p');
+      var p2 = document.createElement('p');
+      var p3 = document.createElement('p');
+      var remove = document.createElement('button');
+      var p1Text = document.createTextNode(response[i].artists + ' @ ' + response[i].city + ', ' + response[i].region);
+      var p2Text = document.createTextNode(response[i].formatted_datetime);
+      var p3Text = document.createTextNode(response[i].name);
+      var remove = document.createElement('button');
+      var btnText = document.createTextNode('Remove from calendar');
+
+      remove.classList.add('btn');
+      remove.classList.add('btn-secondary');
+      remove.id = i;
+      p1.classList.add('bold');
+      myEvent.classList.add('saved-event');
+
+      p1.appendChild(p1Text);
+      p2.appendChild(p2Text);
+      p3.appendChild(p3Text);
+      remove.appendChild(btnText);
+
+      myEvent.appendChild(p1);
+      myEvent.appendChild(p2);
+      myEvent.appendChild(p3);
+      myEvent.appendChild(remove);
+      // append to modal
+      innerContent.appendChild(myEvent);
+
+      initRemove(remove, response[i].eventId);
+    }
+
   })
 })
+
+function initRemove(button, ident) {
+  button.addEventListener('click', function(ev) {
+    console.log('remove btn clicked');
+    console.log('DELETEID:', ident)
+    data = {
+      eventId: ident
+    }
+
+    $.ajax({
+      url: beURL + '/events/' + ident,
+      data: data,
+      dataType: 'json',
+      method: 'DELETE'
+    }).done(function(response) {
+      console.log(ident, 'has been removed');
+      console.log(response)
+    })
+
+
+  })
+}
 
 // ev listener on search button that inits api call to bandplanner api
 search.addEventListener('click', function(ev) {
@@ -36,6 +97,7 @@ search.addEventListener('click', function(ev) {
 
   // need to clear out markers on new search
   evArr = []; // clear out evArr
+  msg.innerHTML = '';
 
   var artistReq = artist.value.toLowerCase();
   console.log('Search button clicked, INPUT:', artistReq);
@@ -64,9 +126,10 @@ search.addEventListener('click', function(ev) {
 });
 
 function noEvMsg(artist) {
-  var msg = document.createElement('div');
+  msg.innerHTML = '';
+  msg = document.createElement('div');
   var par = document.createElement('p');
-  var artistText = document.createTextNode('No upcoming events found for "' + artist + '"   :(   iTry searching for Drake!');
+  var artistText = document.createTextNode('No upcoming events found for "' + artist + '"   :(   Try searching for Drake!');
   par.id = 'error-msg';
   par.appendChild(artistText);
   msg.appendChild(par);
@@ -147,10 +210,12 @@ function addArtistHeader(name) {
 function makeTrackDiv(track) {
   var playDiv = document.createElement('div');
   var h5 = document.createElement('h5');
+  var contDiv = document.createElement('div');
   var songImg = document.createElement('img');
   var nameText = document.createTextNode(track.name);
   var audio = document.createElement('audio');
 
+  contDiv.classList.add('alb-img');
   h5.appendChild(nameText);
   playDiv.classList.add('track');
   audio.setAttribute('src', track.preview_url);
@@ -159,7 +224,8 @@ function makeTrackDiv(track) {
   songImg.id = track.id;
   songImg.appendChild(audio);
   playDiv.appendChild(h5);
-  playDiv.appendChild(songImg);
+  playDiv.appendChild(contDiv);
+  contDiv.appendChild(songImg);
   songsDiv.appendChild(playDiv);
 }
 
@@ -276,7 +342,7 @@ function initMap(lat, lon) {
 
   map = new google.maps.Map(document.querySelector('#map'), {
     center: {lat: 39.8, lng: -98.6},
-    scrollwheel: false,
+    scrollwheel: true,
     zoom: 4
   });
 
@@ -326,6 +392,7 @@ function createMarker(event) {
 
   var marker = new google.maps.Marker({
     position: pos,
+    animation: google.maps.Animation.DROP,
     map: map
   })
 
@@ -353,36 +420,4 @@ function createMarker(event) {
         }) // end ajax
     })
   })
-}
-
-function auto() {
-  $(function() {
-    var autoChoices = [
-      'Tedeschi Trucks Band',
-      'Drake',
-      'Adele',
-      'Heartless Bastards',
-      'Billy Idol',
-      'Billy Joel',
-      'Steely Dan',
-      'Norah Jones',
-      'Alabama Shakes',
-      'Sia',
-      'Flogging Molly',
-      'Flight of the Conchords',
-      'Goo Goo Dolls',
-      'Bonnie Rait',
-      'Wilco',
-      'Kenny G',
-      'Alice in Chains',
-      'M83',
-      'Modest Mouse',
-      'The Lumineers',
-      'Wierd Al Yankovic'
-    ];
-    $('#artist-box').autocomplete({
-      source: autoChoices,
-      minLength: 3,
-    });
-  });
 }
