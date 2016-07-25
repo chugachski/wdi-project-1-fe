@@ -14,14 +14,16 @@ var mapContainer = document.querySelector('#map');
 var search = document.querySelector('#search-button');
 var artist = document.querySelector('#artist-box');
 var songsDiv = document.querySelector('#songs');
+var songHead = document.querySelector('#song-header');
+var songCont = document.querySelector('#song-container');
 var form = document.querySelector('.form-group');
 var viewB = document.querySelector('#view-cal');
 var modal = document.querySelector('#modal');
 var closeBtn = document.querySelector('#hide');
 var innerContent = document.querySelector('.modal-body');
 
-// var beURL = 'http://localhost:3000';
-var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
+var beURL = 'http://localhost:3000';
+// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 
 viewB.addEventListener('click', function(ev) {
   ev.preventDefault();
@@ -115,6 +117,7 @@ search.addEventListener('click', function(ev) {
   var data = {
     artist: artistReq
   }
+  console.log(data)
   $.ajax({
     url: beURL + '/planner/search',
     data: data,
@@ -178,51 +181,53 @@ function spotifyReq(artistId) {
     console.log('SPOTIFY top tracks resp:', response);
     makeTrackO(response);
     console.log('TRACK ARR:', trackArr);
+    // clear out '#songCont'
+    songCont.innerHTML = '';
     callTrack(trackArr);
-
   })
 }
 
 // call makeTrackDiv with 3 random top songs
 function callTrack(tracks) {
   var randArr = [];
-
     while (randArr.length < 3) {
       var idx = Math.floor(Math.random() * tracks.length);
       if (!randArr.includes(idx)) { // only add if num is unique
         randArr.push(idx);
       }
     }
-
-  // console.log('RANDARR:', randArr);
+  console.log('RANDARR:', randArr);
 
   addArtistHeader(tracks[0].artists);
 
   for (j=0; j<randArr.length; j++) {
     makeTrackDiv(tracks[randArr[j]]);
   }
+
   initSongListeners();
 }
 
 // adds headers to sidebar results from spotify req
 function addArtistHeader(name) {
+  // clear out #song-header div
+  songHead.innerHTML = '';
+
   var h3 = document.createElement('h3');
-  var h5 = document.createElement('h5');
   var h3Sub = document.createElement('h3');
   var headingText = document.createTextNode('Preview the ' + name + ' concert!');
   var headingTextTwo = document.createTextNode('Click an image to play:');
-  var artistText = document.createTextNode(name);
 
   h3.appendChild(headingText);
   h3Sub.appendChild(headingTextTwo);
-  h5.appendChild(artistText);
-  songsDiv.appendChild(h3);
-  songsDiv.appendChild(h3Sub);
+  songHead.appendChild(h3);
+  songHead.appendChild(h3Sub);
 }
 
 // adds album divs to sidebar
 function makeTrackDiv(track) {
-  var playDiv = document.createElement('div');
+
+
+  // var playDiv = document.createElement('div');
   var h5 = document.createElement('h5');
   var contDiv = document.createElement('div');
   var songImg = document.createElement('img');
@@ -231,16 +236,16 @@ function makeTrackDiv(track) {
 
   contDiv.classList.add('alb-img');
   h5.appendChild(nameText);
-  playDiv.classList.add('track');
+  // playDiv.classList.add('track');
   audio.setAttribute('src', track.preview_url);
   songImg.setAttribute('src', track.image);
   songImg.classList.add('album');
   songImg.id = track.id;
   songImg.appendChild(audio);
-  playDiv.appendChild(h5);
-  playDiv.appendChild(contDiv);
+  songCont.appendChild(h5);
+  songCont.appendChild(contDiv);
   contDiv.appendChild(songImg);
-  songsDiv.appendChild(playDiv);
+  songsDiv.appendChild(songCont);
 }
 
 // citation: uses Babajide Kale's technique
@@ -248,8 +253,8 @@ function initSongListeners() {
   // add ev listener to entire doc
   document.addEventListener('click', function(event) {
     // console.log('EV OBJ:', event);
-    var songId = document.getElementById(event.target.id)
-    // console.log('songId.firstChild:', songId.firstChild);
+    var songId = document.getElementById(event.target.id);
+    console.log('songId.firstChild:', songId.firstChild);
     // console.log('songId:', songId);
     if (event.target.id) {
       if (isPlaying === false) {
@@ -269,6 +274,7 @@ function initSongListeners() {
 // make an object with just the things I'm interested in
 function makeTrackO(resp) {
   var trackObj = {};
+  trackArr = [];
   for (var i=0; i<resp.tracks.length; i++) {
 
     for (prop in resp.tracks[i]) {
@@ -288,8 +294,8 @@ function makeTrackO(resp) {
         trackObj['image'] = resp.tracks[i].album.images[1].url;
         trackObj['id'] = resp.tracks[i].album.id;
       }
-      // trackObj['id'] = Math.floor(Math.random() * 1000);
     }
+
   trackArr.push(trackObj);
   trackObj = {}; // clear out the old contents
   }
