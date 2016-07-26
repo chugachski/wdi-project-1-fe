@@ -21,9 +21,10 @@ var viewB = document.querySelector('#view-cal');
 var modal = document.querySelector('#modal');
 var closeBtn = document.querySelector('#hide');
 var innerContent = document.querySelector('.modal-body');
+var doubleListen = false;
 
-// var beURL = 'http://localhost:3000';
-var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
+var beURL = 'http://localhost:3000';
+// var beURL = 'https://peaceful-dawn-99409.herokuapp.com';
 
 viewB.addEventListener('click', function(ev) {
   ev.preventDefault();
@@ -110,6 +111,7 @@ search.addEventListener('click', function(ev) {
   // need to clear out markers on new search
   evArr = []; // clear out evArr
   msg.innerHTML = '';
+
 
   var artistReq = artist.value.toLowerCase();
   console.log('Search button clicked, INPUT:', artistReq);
@@ -248,14 +250,20 @@ function makeTrackDiv(track) {
   songsDiv.appendChild(songCont);
 }
 
-// citation: uses Babajide Kale's technique
+
 function initSongListeners() {
+  if (doubleListen) {
+    doubleListen.removeEventListener('click', arguments.callee);
+  }
+
+  // citation: uses Babajide Kale's technique
   // add ev listener to entire doc
   document.addEventListener('click', function(event) {
-    // console.log('EV OBJ:', event);
+    // console.log('EV.target.id:', event.target.id);
     var songId = document.getElementById(event.target.id);
     console.log('songId.firstChild:', songId.firstChild);
-    // console.log('songId:', songId);
+    doubleListen = true;
+
     if (event.target.id) {
       if (isPlaying === false) {
         songId.firstChild.play();
